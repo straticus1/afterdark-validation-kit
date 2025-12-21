@@ -1,0 +1,108 @@
+{
+  "version": "1.0.0",
+  "name": "AfterDark Validation Kit",
+  "description": "Comprehensive infrastructure validation toolkit for AfterDark ecosystem",
+
+  "environments": {
+    "production": {
+      "base_url": "https://afterdarksys.com",
+      "cdn_url": "https://cdn.afterdarksys.com"
+    },
+    "staging": {
+      "base_url": "https://staging.afterdarksys.com",
+      "cdn_url": "https://staging-cdn.afterdarksys.com"
+    },
+    "development": {
+      "base_url": "http://localhost:3000",
+      "cdn_url": "http://localhost:3001"
+    }
+  },
+
+  "sites": [
+    {"domain": "aeims.app", "type": "platform", "priority": 1},
+    {"domain": "sexacomms.com", "type": "site", "priority": 1},
+    {"domain": "flirts.nyc", "type": "site", "priority": 1},
+    {"domain": "nycflirts.com", "type": "site", "priority": 1},
+    {"domain": "9inchesof.com", "type": "site", "priority": 2},
+    {"domain": "beastybitches.com", "type": "site", "priority": 2},
+    {"domain": "cavernof.love", "type": "site", "priority": 2},
+    {"domain": "cucking.life", "type": "site", "priority": 2},
+    {"domain": "dommecats.com", "type": "site", "priority": 2},
+    {"domain": "fantasyflirts.live", "type": "site", "priority": 2},
+    {"domain": "gfecalls.com", "type": "site", "priority": 2},
+    {"domain": "holyflirts.com", "type": "site", "priority": 2},
+    {"domain": "latenite.ai", "type": "site", "priority": 2},
+    {"domain": "latenite.love", "type": "site", "priority": 2},
+    {"domain": "phonesex.money", "type": "site", "priority": 2},
+    {"domain": "shrinkshack.com", "type": "site", "priority": 2},
+    {"domain": "psosoundoff.com", "type": "site", "priority": 3}
+  ],
+
+  "apis": {
+    "cloudflare": {
+      "enabled": true,
+      "api_url": "https://api.cloudflare.com/client/v4",
+      "token_env": "CLOUDFLARE_API_TOKEN",
+      "zone_ids": {}
+    },
+    "oracle_cloud": {
+      "enabled": true,
+      "tenancy_ocid_env": "OCI_TENANCY_OCID",
+      "user_ocid_env": "OCI_USER_OCID",
+      "fingerprint_env": "OCI_FINGERPRINT",
+      "private_key_path_env": "OCI_PRIVATE_KEY_PATH",
+      "region": "us-ashburn-1",
+      "compartment_ocid_env": "OCI_COMPARTMENT_OCID"
+    },
+    "neon": {
+      "enabled": true,
+      "api_url": "https://console.neon.tech/api/v2",
+      "api_key_env": "NEON_API_KEY",
+      "project_ids": {}
+    },
+    "aws": {
+      "enabled": true,
+      "access_key_env": "AWS_ACCESS_KEY_ID",
+      "secret_key_env": "AWS_SECRET_ACCESS_KEY",
+      "region": "us-east-1"
+    }
+  },
+
+  "tests": {
+    "functional": {
+      "enabled": true,
+      "timeout": 30000,
+      "retries": 2
+    },
+    "security": {
+      "enabled": true,
+      "xss_testing": true,
+      "csrf_testing": true,
+      "session_testing": true,
+      "cookie_testing": true,
+      "auth_testing": true
+    },
+    "api": {
+      "enabled": true,
+      "validate_responses": true,
+      "check_status_codes": true,
+      "measure_latency": true
+    },
+    "infrastructure": {
+      "enabled": true,
+      "dns_checks": true,
+      "ssl_checks": true,
+      "cdn_checks": true,
+      "database_checks": true
+    }
+  },
+
+  "reporting": {
+    "output_dir": "./reports",
+    "formats": ["json", "html", "markdown"],
+    "save_screenshots": true,
+    "verbose": true
+  },
+
+  "api_keys": {}
+}

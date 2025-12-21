@@ -1,0 +1,1084 @@
+{
+  "infrastructure_summary": {
+    "project_name": "Afterdark Validation Kit",
+    "description": "Comprehensive validation infrastructure for multi-site adult entertainment platform with VoIP, billing, and device control",
+    "generated_date": "2025-12-21",
+    "total_sites": 17,
+    "microservices": 12,
+    "cloud_providers": ["AWS", "OCI (planned)", "Cloudflare"]
+  },
+  
+  "api_endpoints": {
+    "aeims_app_core_apis": {
+      "calls_api": {
+        "file": "/Users/ryan/development/aeims.app/api/calls.php",
+        "description": "WebRTC Call Management API - handles peer-to-peer video/audio calls",
+        "database": "PostgreSQL (aeims_core)",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/api/calls.php",
+            "actions": ["initiate", "accept", "reject", "end", "signal"],
+            "description": "Call lifecycle management with WebRTC signaling"
+          },
+          {
+            "method": "GET",
+            "path": "/api/calls.php",
+            "actions": ["status", "active"],
+            "description": "Get call status and active calls list"
+          }
+        ],
+        "authentication": "Database-driven (PDO)",
+        "key_tables": ["call_sessions", "operators", "customers", "notifications"]
+      },
+      
+      "operators_api": {
+        "file": "/Users/ryan/development/aeims.app/api/operators.php",
+        "description": "Operator Status Management API - real-time operator management",
+        "database": "PostgreSQL (aeims_core)",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/operators.php?action=list",
+            "description": "List all operators with profiles"
+          },
+          {
+            "method": "GET",
+            "path": "/api/operators.php?action=available",
+            "description": "List available operators for calls"
+          },
+          {
+            "method": "POST",
+            "path": "/api/operators.php?action=status",
+            "description": "Update operator status (online/offline/busy/away)"
+          },
+          {
+            "method": "GET",
+            "path": "/api/operators.php?action=stats",
+            "description": "Get operator statistics and earnings"
+          },
+          {
+            "method": "GET",
+            "path": "/api/operators.php?action=earnings&id=X",
+            "description": "Get detailed operator earnings breakdown"
+          }
+        ],
+        "key_tables": ["operators", "operator_profiles", "call_sessions", "audit_log"]
+      },
+      
+      "dashboard_api": {
+        "file": "/Users/ryan/development/aeims.app/api/dashboard.php",
+        "description": "Dashboard Data API - real-time statistics and metrics",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/api/dashboard.php?action=operator&id=X",
+            "description": "Operator dashboard with today/week/month stats"
+          },
+          {
+            "method": "GET",
+            "path": "/api/dashboard.php?action=platform",
+            "description": "Platform-wide statistics and active calls"
+          },
+          {
+            "method": "GET",
+            "path": "/api/dashboard.php?action=earnings&id=X",
+            "description": "Detailed earnings breakdown by date and type"
+          }
+        ]
+      }
+    },
+    
+    "aeims_agents_apis": {
+      "file": "/Users/ryan/development/aeims/agents/api/",
+      "description": "Agent communication APIs",
+      "endpoints": [
+        {
+          "file": "chat-send.php",
+          "description": "Send chat messages between operators and customers"
+        },
+        {
+          "file": "chat-poll.php",
+          "description": "Poll for new chat messages"
+        },
+        {
+          "file": "operator-status.php",
+          "description": "Update operator real-time status"
+        }
+      ]
+    },
+    
+    "afterdarksys_admin_panel_apis": {
+      "base": "/Users/ryan/development/afterdarksys.com/admin-panel/app/api",
+      "framework": "Next.js (TypeScript)",
+      "authentication": "JWT + NextAuth + 2FA",
+      "database": "Prisma ORM",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/auth/login",
+          "file": "auth/login/route.ts",
+          "description": "User login with JWT token generation and session management",
+          "features": [
+            "Email/password authentication",
+            "Account lockout on failed attempts",
+            "Two-factor authentication support",
+            "Secure HTTP-only cookies",
+            "IP logging and user agent tracking",
+            "Audit logging"
+          ],
+          "response": {
+            "success": "boolean",
+            "user": {
+              "id": "string",
+              "email": "string",
+              "name": "string",
+              "role": "ADMIN|SUPER_ADMIN|USER"
+            }
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/health",
+          "file": "health/route.ts",
+          "description": "System health check endpoint",
+          "checks": [
+            "Database connectivity",
+            "Memory usage",
+            "Error rates (last hour, 24h)"
+          ],
+          "status_codes": {
+            "200": "healthy or degraded",
+            "503": "critical"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/health",
+          "http_method": "HEAD",
+          "description": "Quick health check with headers"
+        },
+        {
+          "method": "GET",
+          "path": "/api/metrics",
+          "file": "metrics/route.ts",
+          "description": "System metrics API (admin/super_admin only)",
+          "requires_auth": true,
+          "query_params": {
+            "type": "auth|users|security|audit|health|overview",
+            "timeframe": "hour|day|week"
+          },
+          "metrics_types": [
+            "Authentication success rates and failed logins",
+            "User metrics (total, active, new)",
+            "Security metrics (2FA adoption, suspicious activity)",
+            "Audit summaries",
+            "System health"
+          ]
+        }
+      ]
+    },
+    
+    "pmportal_apis": {
+      "base": "/Users/ryan/development/afterdarksys.com/pmportal/api/v1",
+      "file": "index.php",
+      "description": "Property management portal API",
+      "endpoints": [
+        {
+          "path": "/api/v1/status",
+          "method": "GET",
+          "description": "Public health check for ALB"
+        },
+        {
+          "path": "/api/v1/auth",
+          "method": "POST",
+          "description": "Authentication endpoint"
+        },
+        {
+          "path": "/api/v1/users",
+          "description": "User management endpoints"
+        },
+        {
+          "path": "/api/v1/acl",
+          "description": "ACL and ticket management"
+        }
+      ]
+    }
+  },
+  
+  "sites_configuration": {
+    "total_sites": 17,
+    "shared_infrastructure": "afterdarksys.com VPC with shared ALB and ECS cluster",
+    "sites": [
+      {
+        "domain": "flirts.nyc",
+        "theme": "Red/Dark Red",
+        "features": ["chat", "voice", "video"],
+        "api_location": "/Users/ryan/development/aeims.app/sites/flirts.nyc/api",
+        "config": "shared with aeims.app"
+      },
+      {
+        "domain": "nycflirts.com",
+        "theme": "Blue/Gray",
+        "config_file": "/Users/ryan/development/aeims.app/sites/nycflirts.com/config.json",
+        "config_content": {
+          "site_name": "nycflirts.com",
+          "theme": "default",
+          "features": ["chat", "voice", "video"],
+          "telephony_platform_url": "http://localhost:3000",
+          "enabled": true
+        },
+        "api_location": "/Users/ryan/development/aeims.app/sites/nycflirts.com/api"
+      },
+      {
+        "domain": "sexacomms.com",
+        "theme": "Purple",
+        "linked": "sexacomms symbolic link to aeims/"
+      },
+      {
+        "domain": "9inchesof.com",
+        "theme": "Black/Red/Gold"
+      },
+      {
+        "domain": "beastybitches.com",
+        "theme": "Brown/Orange"
+      },
+      {
+        "domain": "cavernof.love",
+        "theme": "Purple/Indigo"
+      },
+      {
+        "domain": "cucking.life",
+        "theme": "Dark Red"
+      },
+      {
+        "domain": "dommecats.com",
+        "theme": "Black/Purple/Magenta"
+      },
+      {
+        "domain": "fantasyflirts.live",
+        "theme": "Hot Pink"
+      },
+      {
+        "domain": "gfecalls.com",
+        "theme": "Pink"
+      },
+      {
+        "domain": "holyflirts.com",
+        "theme": "Gold/Navy"
+      },
+      {
+        "domain": "latenite.ai",
+        "theme": "Cyan/Magenta"
+      },
+      {
+        "domain": "latenite.love",
+        "theme": "Midnight Blue"
+      },
+      {
+        "domain": "phonesex.money",
+        "theme": "Green/Gold"
+      },
+      {
+        "domain": "shrinkshack.com",
+        "theme": "Professional Blue"
+      },
+      {
+        "domain": "psosoundoff.com",
+        "theme": "Orange Red",
+        "linked": "psosoundoff.com symbolic link"
+      },
+      {
+        "domain": "aeims.app",
+        "theme": "Gray/Blue",
+        "description": "Operator portal and admin interface"
+      }
+    ]
+  },
+  
+  "cloud_infrastructure": {
+    "current_deployment": {
+      "provider": "AWS",
+      "services_used": [
+        "ECS Fargate",
+        "RDS (MySQL/PostgreSQL)",
+        "ALB (Application Load Balancer)",
+        "Route53",
+        "S3",
+        "CloudFront",
+        "SES (email)",
+        "ACM (SSL/TLS)",
+        "CloudWatch"
+      ],
+      "estimated_monthly_cost": "$4000"
+    },
+    
+    "planned_oci_migration": {
+      "status": "Planning phase - awaiting API credentials",
+      "mapping_documentation": "/Users/ryan/development/oracle-oci/AWS-TO-OCI-MAPPING.md",
+      "equivalent_services": {
+        "EC2": "OCI Compute (VM.Standard)",
+        "ECS Fargate": "OCI Container Instances or OKE",
+        "RDS": "OCI MySQL Database Service",
+        "ALB": "OCI Flexible Load Balancer",
+        "Route53": "OCI DNS",
+        "S3": "OCI Object Storage",
+        "CloudFront": "Cloudflare (recommended)",
+        "SES": "OCI Email Delivery"
+      },
+      "oci_always_free_tier": {
+        "arm_compute_vms": "4 (4 OCPUs, 24GB RAM total)",
+        "amd_compute_vms": "2 (1/8 OCPU, 1GB RAM each)",
+        "block_volumes": "2 (200GB total)",
+        "object_storage": "10GB",
+        "autonomous_databases": "2 (20GB each)",
+        "load_balancer": "10Mbps",
+        "data_transfer_outbound": "10TB"
+      },
+      "estimated_oci_cost": "$500-1500/month (60-85% savings)",
+      "priority_migration_order": [
+        "dnsscience.io (DNS API critical)",
+        "Static/light sites (heartofatoaster.com, veribits.com)",
+        "aeims.app ecosystem",
+        "Independent sites",
+        "Complex sites (DocumentDB, high resource)"
+      ]
+    },
+    
+    "cloudflare_integration": {
+      "location": "/Users/ryan/development/cloudflare",
+      "status": "Configured",
+      "purpose": "CDN and DDoS protection"
+    }
+  },
+  
+  "database_architecture": {
+    "databases": [
+      {
+        "name": "aeims_core",
+        "type": "PostgreSQL",
+        "connection": "postgresql://aeims_user@aeims-postgres:5432/aeims_core",
+        "environment_vars": {
+          "DB_HOST": "aeims-postgres or host.docker.internal",
+          "DB_PORT": "5432",
+          "DB_NAME": "aeims_core",
+          "DB_USER": "aeims_user",
+          "DB_PASS": "aeims_local_dev_2024"
+        },
+        "core_tables": [
+          "users",
+          "operators",
+          "customers",
+          "call_sessions",
+          "call_recordings",
+          "billing_accounts",
+          "transactions",
+          "invoices",
+          "device_sessions",
+          "device_commands",
+          "notifications",
+          "chat_messages",
+          "audit_log",
+          "operator_earnings_summary",
+          "operator_profiles",
+          "sites"
+        ],
+        "key_features": [
+          "Real-time call tracking",
+          "Pay-per-minute billing",
+          "Operator status management",
+          "Device control integration",
+          "Message history"
+        ]
+      }
+    ],
+    
+    "caching": {
+      "type": "Redis",
+      "host": "redis",
+      "port": "6379",
+      "configuration": {
+        "password": "optional",
+        "default_use": "Session storage, job queue, real-time data"
+      }
+    }
+  },
+  
+  "microservices_architecture": {
+    "base_path": "/Users/ryan/development/aeims/telephony-platform/services",
+    "services": [
+      {
+        "name": "user-service",
+        "port": "8001",
+        "description": "User authentication and profile management",
+        "key_endpoints": [
+          "POST /api/auth/login",
+          "POST /api/auth/register",
+          "GET /api/users/{id}",
+          "PUT /api/users/{id}"
+        ]
+      },
+      {
+        "name": "billing-service",
+        "port": "8002",
+        "description": "Payment processing and pay-per-minute billing",
+        "key_endpoints": [
+          "GET /api/billing/balance",
+          "POST /api/billing/charge",
+          "GET /api/billing/transactions"
+        ]
+      },
+      {
+        "name": "call-service",
+        "port": "8003",
+        "description": "VoIP call routing and management",
+        "key_endpoints": [
+          "POST /api/calls/initiate",
+          "PUT /api/calls/{id}/end",
+          "GET /api/calls/{id}/recording"
+        ]
+      },
+      {
+        "name": "operator-service",
+        "description": "Operator dashboard and call handling",
+        "key_features": [
+          "Real-time status management",
+          "Call queue handling",
+          "Earnings tracking",
+          "Performance metrics"
+        ]
+      },
+      {
+        "name": "notification-service",
+        "description": "Email, SMS, and push notifications",
+        "integration": "Twilio, SendGrid"
+      },
+      {
+        "name": "verification-service",
+        "description": "Age verification and compliance",
+        "location": "/Users/ryan/development/aeims.app/services/id-verify-service"
+      },
+      {
+        "name": "admin-service",
+        "port": "8000",
+        "description": "Administrative interface and site management",
+        "location": "/Users/ryan/development/aeims.app/services/admin-service"
+      },
+      {
+        "name": "conference-service",
+        "description": "Multi-party conference calling"
+      },
+      {
+        "name": "analytics-service",
+        "description": "Metrics, reporting, and business intelligence"
+      },
+      {
+        "name": "content-service",
+        "description": "Content management"
+      },
+      {
+        "name": "file-service",
+        "description": "File storage and management"
+      },
+      {
+        "name": "marketing-service",
+        "description": "Marketing automation"
+      }
+    ]
+  },
+  
+  "voip_infrastructure": {
+    "components": [
+      {
+        "name": "Asterisk PBX",
+        "type": "On-premises call routing",
+        "integration": "Extensions configuration, SIP peers, voicemail",
+        "docker_image": "Custom Dockerfile available"
+      },
+      {
+        "name": "AWS Connect",
+        "type": "Cloud-based call center",
+        "features": [
+          "Contact flows",
+          "Queue management",
+          "Real-time metrics",
+          "Call recording"
+        ]
+      },
+      {
+        "name": "Janus Gateway",
+        "type": "WebRTC media gateway",
+        "docker_config": "/Users/ryan/development/aeims/docker/janus-gateway/docker-compose.yml"
+      }
+    ],
+    
+    "protocols": [
+      "SIP (Session Initiation Protocol)",
+      "RTP (Real-time Transport Protocol)",
+      "WebRTC (Web Real-Time Communication)"
+    ],
+    
+    "device_integration": {
+      "library": "aeimsLib",
+      "supported_devices": [
+        "Lovense (interactive toys)",
+        "WeVibe (Bluetooth devices)",
+        "Kiiroo (teledildonics)",
+        "Buttplug.io protocol support"
+      ],
+      "connection": "WebSocket over wss://",
+      "command_structure": {
+        "sessionId": "call-session-id",
+        "deviceType": "device type",
+        "command": "vibrate|rotate|thrust|etc",
+        "parameters": {
+          "intensity": "0-100",
+          "duration": "milliseconds"
+        }
+      }
+    }
+  },
+  
+  "testing_infrastructure": {
+    "test_framework": "Playwright",
+    "test_languages": ["TypeScript", "PHP"],
+    "locations": [
+      {
+        "path": "/Users/ryan/development/aeims/tests",
+        "description": "AEIMS comprehensive test suite",
+        "package_file": "package.json",
+        "scripts": {
+          "test": "playwright test",
+          "test:headed": "playwright test --headed",
+          "test:debug": "playwright test --debug",
+          "test:admin": "playwright test --grep @admin",
+          "test:operators": "playwright test --grep @operators",
+          "test:customers": "playwright test --grep @customers",
+          "test:sso": "playwright test --grep @sso",
+          "test:branding": "playwright test --grep @branding",
+          "test:credits": "playwright test --grep @credits"
+        },
+        "test_file": "login-tests.spec.ts"
+      },
+      {
+        "path": "/Users/ryan/development/aeims/tests/e2e",
+        "description": "End-to-end tests with Puppeteer"
+      },
+      {
+        "path": "/Users/ryan/development/aeims/tests/functional",
+        "description": "Functional tests"
+      },
+      {
+        "path": "/Users/ryan/development/aeims/tests/API",
+        "description": "API tests"
+      },
+      {
+        "path": "/Users/ryan/development/aeims/tests/Feature",
+        "description": "Feature tests"
+      }
+    ],
+    
+    "test_credentials_location": "/Users/ryan/development/aeims/tests/TEST_CREDENTIALS.md",
+    
+    "test_sites": [
+      "flirts.nyc",
+      "nycflirts.com",
+      "sexacomms.com",
+      "9inchesof.com",
+      "beastybitches.com",
+      "cavernof.love",
+      "fantasyflirts.live",
+      "gfecalls.com",
+      "holyflirts.com",
+      "latenite.ai",
+      "latenite.love",
+      "phonesex.money",
+      "shrinkshack.com",
+      "psosoundoff.com",
+      "cucking.life",
+      "dommecats.com",
+      "aeims.app"
+    ],
+    
+    "test_coverage": [
+      {
+        "category": "@admin",
+        "description": "Admin login and management on aeims.app"
+      },
+      {
+        "category": "@operators",
+        "description": "Operator login and call handling"
+      },
+      {
+        "category": "@customers",
+        "description": "Customer login and purchasing"
+      },
+      {
+        "category": "@sso",
+        "description": "Single sign-on across sites"
+      },
+      {
+        "category": "@branding",
+        "description": "Site-specific branding and theming"
+      },
+      {
+        "category": "@credits",
+        "description": "Credit system and billing"
+      }
+    ]
+  },
+  
+  "authentication_patterns": {
+    "jwt_based": {
+      "location": "/Users/ryan/development/afterdarksys.com/admin-panel/app/api/auth/login/route.ts",
+      "token_structure": {
+        "payload": {
+          "userId": "string",
+          "email": "string",
+          "role": "ADMIN|SUPER_ADMIN|USER",
+          "twoFactorVerified": "boolean"
+        },
+        "issuer": "afterdarksys-admin",
+        "audience": "afterdarksys-users",
+        "expiration": "24h or 30d (if rememberMe)"
+      },
+      "features": [
+        "HTTP-only secure cookies",
+        "Account lockout on failed attempts",
+        "Two-factor authentication support",
+        "IP and user agent tracking",
+        "Session management with expiry"
+      ]
+    },
+    
+    "session_management": {
+      "table": "sessions",
+      "fields": [
+        "userId",
+        "sessionToken",
+        "expires",
+        "ipAddress",
+        "userAgent",
+        "isActive"
+      ]
+    },
+    
+    "security_features": {
+      "password_hashing": "bcryptjs",
+      "email_verification": "Required before login",
+      "two_factor_auth": "TOTP/SMS based",
+      "account_lockout": "After multiple failed attempts",
+      "audit_logging": "All login attempts tracked",
+      "cors": "Configured per environment"
+    },
+    
+    "cross_site_sso": {
+      "cookie_domain": ".afterdarksystems.net",
+      "shared_session_store": "Redis",
+      "sites_participating": "All 17 AEIMS sites"
+    }
+  },
+  
+  "environment_configuration": {
+    "configuration_files": [
+      {
+        "path": "/Users/ryan/development/aeims/telephony-platform/.env",
+        "type": "Unified platform config",
+        "services": ["user-service", "billing-service", "call-service", "operator-service", "notification-service"]
+      },
+      {
+        "path": "/Users/ryan/development/disease.zone/.env",
+        "type": "Blockchain/ledger config"
+      },
+      {
+        "path": "/Users/ryan/development/politics.place/.env",
+        "type": "Politics.place config"
+      },
+      {
+        "path": "/Users/ryan/development/veribits.com/app/.env",
+        "type": "Veribits config"
+      }
+    ],
+    
+    "key_environment_variables": {
+      "database": [
+        "DB_HOST",
+        "DB_PORT",
+        "DB_NAME",
+        "DB_USER",
+        "DB_PASS"
+      ],
+      "cache": [
+        "REDIS_HOST",
+        "REDIS_PORT",
+        "REDIS_PASSWORD"
+      ],
+      "security": [
+        "JWT_SECRET",
+        "JWT_EXPIRATION",
+        "APP_SECRET",
+        "NEXTAUTH_SECRET"
+      ],
+      "api": [
+        "API_VERSION",
+        "API_BASE_URL",
+        "ALLOWED_ORIGINS",
+        "RATE_LIMIT_REQUESTS",
+        "RATE_LIMIT_WINDOW"
+      ],
+      "payments": [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_PUBLISHABLE_KEY",
+        "STRIPE_WEBHOOK_SECRET"
+      ],
+      "email": [
+        "MAIL_MAILER",
+        "MAIL_HOST",
+        "MAIL_PORT",
+        "MAIL_USERNAME",
+        "MAIL_PASSWORD",
+        "MAIL_FROM_ADDRESS"
+      ],
+      "cloud": [
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_REGION"
+      ]
+    }
+  },
+  
+  "docker_infrastructure": {
+    "docker_compose_files": [
+      {
+        "path": "/Users/ryan/development/aeims/docker-compose.yml",
+        "lines": 69,
+        "services": ["admin-service", "id-verify-service", "aeims-web"],
+        "purpose": "Main AEIMS application stack"
+      },
+      {
+        "path": "/Users/ryan/development/aeims/telephony-platform/docker-compose.yml",
+        "lines": 271,
+        "services": [
+          "postgres",
+          "redis",
+          "user-service",
+          "billing-service",
+          "call-service",
+          "operator-service",
+          "notification-service",
+          "verification-service",
+          "admin-service",
+          "analytics-service"
+        ],
+        "purpose": "Unified microservices platform"
+      },
+      {
+        "path": "/Users/ryan/development/aeims/docker/unified/docker-compose.unified.yml",
+        "lines": 343,
+        "purpose": "Unified development environment"
+      },
+      {
+        "path": "/Users/ryan/development/disease.zone/docker-compose.yml",
+        "lines": 175,
+        "purpose": "Disease.zone blockchain platform"
+      },
+      {
+        "path": "/Users/ryan/development/politics.place/docker-compose.yml",
+        "lines": 101,
+        "purpose": "Politics.place deployment"
+      }
+    ],
+    
+    "dockerfile_locations": [
+      "/Users/ryan/development/aeims/docker/unified/Dockerfile.unified",
+      "/Users/ryan/development/aeims/docker/janus-gateway/Dockerfile",
+      "/Users/ryan/development/disease.zone/Dockerfile",
+      "/Users/ryan/development/politics.place/Dockerfile",
+      "/Users/ryan/development/purrr.love/Dockerfile"
+    ]
+  },
+  
+  "services_and_managers": {
+    "location": "/Users/ryan/development/aeims.app/services",
+    "core_managers": [
+      {
+        "class": "AsteriskIntegration.php",
+        "description": "Asterisk PBX integration for VoIP"
+      },
+      {
+        "class": "AuditLogger.php",
+        "description": "Comprehensive activity and security logging"
+      },
+      {
+        "class": "BalanceMonitorService.php",
+        "description": "Customer credit balance monitoring"
+      },
+      {
+        "class": "CustomerManager.php",
+        "description": "Customer account management"
+      },
+      {
+        "class": "DeviceControlClient.php",
+        "description": "Client for aeimsLib device control"
+      },
+      {
+        "class": "DeviceControlManager.php",
+        "description": "Device control session management"
+      },
+      {
+        "class": "DomainManager.php",
+        "description": "Multi-site domain management"
+      },
+      {
+        "class": "MessagingManager.php",
+        "description": "Chat and messaging system"
+      },
+      {
+        "class": "MultisiteManager.php",
+        "description": "Multi-site platform orchestration"
+      },
+      {
+        "class": "NginxManager.php",
+        "description": "Nginx server management and configuration"
+      },
+      {
+        "class": "OperatorManager.php",
+        "description": "Operator account and status management"
+      },
+      {
+        "class": "PaymentManager.php",
+        "description": "Payment and billing management"
+      },
+      {
+        "class": "PaymentProcessorService.php",
+        "description": "Payment gateway integration (Stripe, PayPal)"
+      },
+      {
+        "class": "SiteManager.php",
+        "description": "Site creation, configuration, and management",
+        "last_updated": "2025-11-08"
+      },
+      {
+        "class": "SSLManager.php",
+        "description": "SSL/TLS certificate management"
+      },
+      {
+        "class": "SSOManager.php",
+        "description": "Single sign-on coordination"
+      },
+      {
+        "class": "ToyManager.php",
+        "description": "Interactive device management"
+      }
+    ]
+  },
+  
+  "monitoring_and_observability": {
+    "monitoring_service": "/Users/ryan/development/afterdarksys.com/admin-panel/lib/monitoring",
+    "metrics": [
+      {
+        "category": "System Health",
+        "metrics": [
+          "Uptime",
+          "Database connectivity",
+          "Memory usage percentage",
+          "Database response time"
+        ]
+      },
+      {
+        "category": "Authentication",
+        "metrics": [
+          "Login success rate",
+          "Failed login count",
+          "Locked accounts count"
+        ]
+      },
+      {
+        "category": "Users",
+        "metrics": [
+          "Total users",
+          "Active users (30 days)",
+          "New users (30 days)"
+        ]
+      },
+      {
+        "category": "Security",
+        "metrics": [
+          "Two-factor authentication adoption",
+          "Suspicious activity count"
+        ]
+      },
+      {
+        "category": "Audit",
+        "metrics": [
+          "Login attempts",
+          "Failed authentications",
+          "Account lockouts",
+          "Action logs"
+        ]
+      }
+    ],
+    
+    "health_check_endpoints": [
+      {
+        "path": "/api/health",
+        "method": "GET",
+        "status_codes": {
+          "200": "Healthy or degraded",
+          "503": "Critical"
+        }
+      },
+      {
+        "path": "/api/health",
+        "method": "HEAD",
+        "description": "Quick health check (headers only)"
+      }
+    ]
+  },
+  
+  "validation_kit_requirements": {
+    "purpose": "Comprehensive validation for multi-site adult entertainment platform",
+    "key_validation_areas": [
+      {
+        "area": "API Endpoint Validation",
+        "endpoints_to_validate": [
+          "POST /api/calls.php?action=initiate",
+          "POST /api/calls.php?action=accept",
+          "POST /api/calls.php?action=end",
+          "GET /api/operators.php?action=list",
+          "POST /api/operators.php?action=status",
+          "GET /api/dashboard.php?action=platform",
+          "POST /api/auth/login",
+          "GET /api/health",
+          "GET /api/metrics"
+        ]
+      },
+      {
+        "area": "Database Validation",
+        "checks": [
+          "PostgreSQL connectivity",
+          "Redis cache availability",
+          "Database schema integrity",
+          "Foreign key constraints",
+          "Transaction handling",
+          "JSONB column validation"
+        ]
+      },
+      {
+        "area": "Authentication & Authorization",
+        "tests": [
+          "JWT token generation and validation",
+          "Password hashing (bcryptjs)",
+          "Two-factor authentication",
+          "Account lockout mechanisms",
+          "Role-based access control",
+          "Session management",
+          "Cross-site SSO"
+        ]
+      },
+      {
+        "area": "Call Management",
+        "validations": [
+          "Call initiation workflow",
+          "Operator availability checks",
+          "Customer credit validation",
+          "WebRTC signaling",
+          "Call duration calculation",
+          "Billing integration",
+          "Call recording"
+        ]
+      },
+      {
+        "area": "Billing System",
+        "checks": [
+          "Pay-per-minute calculation",
+          "Platform fee deduction (30%)",
+          "Operator earnings calculation",
+          "Transaction logging",
+          "Credit deduction accuracy"
+        ]
+      },
+      {
+        "area": "Device Control",
+        "validations": [
+          "WebSocket connections",
+          "Device command execution",
+          "Session management",
+          "Command parameter validation",
+          "Supported device types"
+        ]
+      },
+      {
+        "area": "Multi-Site Configuration",
+        "tests": [
+          "Site-specific branding",
+          "Domain routing",
+          "Theme configuration",
+          "Feature flags per site",
+          "SSO across domains"
+      ]
+    ],
+    
+    "test_data_requirements": {
+      "user_accounts": [
+        {
+          "type": "Admin",
+          "count": 1,
+          "features": "Full platform access"
+        },
+        {
+          "type": "Operator",
+          "count": 5,
+          "features": "Call handling, earnings tracking, status management"
+        },
+        {
+          "type": "Customer",
+          "count": 10,
+          "features": "Call initiation, credit management, messaging"
+        }
+      ],
+      
+      "call_simulation_data": {
+        "active_calls": 10,
+        "completed_calls": 100,
+        "pending_calls": 5,
+        "call_types": ["video", "audio"],
+        "durations": "1-60 minutes"
+      }
+    },
+    
+    "performance_benchmarks": {
+      "concurrent_calls": "1000+",
+      "api_response_time": "<200ms",
+      "database_query_time": "<100ms",
+      "authentication_time": "<500ms",
+      "call_initiation_time": "<2s"
+    }
+  },
+  
+  "deployment_infrastructure": {
+    "current_aws_deployment": {
+      "regions": ["us-east-1"],
+      "services": [
+        "ECS Fargate clusters",
+        "RDS databases",
+        "Application Load Balancer",
+        "Route53 DNS",
+        "S3 buckets",
+        "CloudFront distributions"
+      ]
+    },
+    
+    "docker_registry": "AWS ECR (Elastic Container Registry)",
+    
+    "load_balancing": {
+      "type": "AWS Application Load Balancer (ALB)",
+      "health_check_endpoint": "/api/health",
+      "target_groups": [
+          "aeims-app",
+          "admin-panel",
+          "telephony-platform"
+        ]
+    }
+  }
+}
