@@ -1,7 +1,56 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "AfterDark Validation Kit",
   "description": "Comprehensive infrastructure validation toolkit for AfterDark ecosystem",
+
+  "projects": {
+    "enabled": true,
+    "scan_for_credentials": true,
+    "paths": [
+      {
+        "name": "n8nworkflo.ws",
+        "path": "../n8nworkflo.ws",
+        "type": "n8n-deployment",
+        "description": "n8n workflow automation platform deployment"
+      },
+      {
+        "name": "ecosystem.zone",
+        "path": "../ecosystem.zone",
+        "type": "static-site",
+        "description": "Ecosystem zone static website"
+      },
+      {
+        "name": "afterdark-validation-kit",
+        "path": ".",
+        "type": "toolkit",
+        "description": "This validation kit"
+      },
+      {
+        "name": "oci-n8n",
+        "path": "../oci-n8n",
+        "type": "n8n-deployment",
+        "description": "Oracle Cloud n8n infrastructure deployment"
+      },
+      {
+        "name": "warp-oci",
+        "path": "../warp-oci",
+        "type": "cloud-platform",
+        "description": "Cloud-hosted Warp AI agent instances on Oracle Cloud"
+      },
+      {
+        "name": "infrastructure.zone",
+        "path": "../infrastructure.zone",
+        "type": "infrastructure-platform",
+        "description": "Multi-tenant infrastructure rental platform"
+      },
+      {
+        "name": "afterdarksys.com",
+        "path": "../afterdarksys.com",
+        "type": "main-site",
+        "description": "Main After Dark Systems website and SSO provider"
+      }
+    ]
+  },
 
   "environments": {
     "production": {
@@ -18,27 +67,49 @@
     }
   },
 
+  "sso": {
+    "provider": "login.afterdarksys.com",
+    "loginPath": "/",
+    "description": "After Dark Systems Central Login - SSO for all platforms"
+  },
+
   "sites": [
-    {"domain": "aeims.app", "type": "platform", "priority": 1},
-    {"domain": "sexacomms.com", "type": "site", "priority": 1},
-    {"domain": "flirts.nyc", "type": "site", "priority": 1},
-    {"domain": "nycflirts.com", "type": "site", "priority": 1},
-    {"domain": "9inchesof.com", "type": "site", "priority": 2},
-    {"domain": "beastybitches.com", "type": "site", "priority": 2},
-    {"domain": "cavernof.love", "type": "site", "priority": 2},
-    {"domain": "cucking.life", "type": "site", "priority": 2},
-    {"domain": "dommecats.com", "type": "site", "priority": 2},
-    {"domain": "fantasyflirts.live", "type": "site", "priority": 2},
-    {"domain": "gfecalls.com", "type": "site", "priority": 2},
-    {"domain": "holyflirts.com", "type": "site", "priority": 2},
-    {"domain": "latenite.ai", "type": "site", "priority": 2},
-    {"domain": "latenite.love", "type": "site", "priority": 2},
-    {"domain": "phonesex.money", "type": "site", "priority": 2},
-    {"domain": "shrinkshack.com", "type": "site", "priority": 2},
-    {"domain": "psosoundoff.com", "type": "site", "priority": 3}
+    {"domain": "afterdarksys.com", "type": "platform", "priority": 1, "auth": "sso", "spa": true, "expectFeatures": ["admin", "operators"]},
+    {"domain": "login.afterdarksys.com", "type": "auth", "priority": 1, "auth": "local", "loginPath": "/", "spa": true},
+    {"domain": "n8nworkflo.ws", "type": "n8n", "priority": 1, "project": "n8nworkflo.ws", "auth": "local", "loginPath": "/signin", "spa": true, "thirdParty": true},
+    {"domain": "ecosystem.zone", "type": "static", "priority": 1, "project": "ecosystem.zone", "auth": "none", "spa": false},
+    {"domain": "infrastructure.zone", "type": "platform", "priority": 1, "auth": "sso", "spa": true, "framework": "astro"},
+    {"domain": "aiserve.farm", "type": "platform", "priority": 1, "auth": "sso", "spa": true, "framework": "astro"},
+    {"domain": "warp-oci.afterdarksys.com", "type": "api", "priority": 1, "auth": "sso", "spa": false, "framework": "python"},
+    {"domain": "dnsscience.io", "type": "service", "priority": 1, "auth": "local", "loginPath": "/login", "spa": false, "framework": "python"},
+    {"domain": "hostscience.io", "type": "landing", "priority": 1, "auth": "sso", "spa": false},
+    {"domain": "flipdomain.io", "type": "landing", "priority": 2, "auth": "sso", "spa": false},
+    {"domain": "flipid.io", "type": "landing", "priority": 2, "auth": "sso", "spa": false},
+    {"domain": "lonely.fyi", "type": "webapp", "priority": 2, "auth": "local", "loginPath": "/login", "spa": true, "framework": "node"},
+    {"domain": "veribits.com", "type": "webapp", "priority": 2, "auth": "sso", "spa": false, "framework": "node"},
+    {"domain": "9lives.xyz", "type": "webapp", "priority": 2, "auth": "sso", "spa": true, "framework": "node"},
+    {"domain": "undatable.me", "type": "webapp", "priority": 2, "auth": "sso", "spa": false, "framework": "php"},
+    {"domain": "politics.place", "type": "webapp", "priority": 2, "auth": "sso", "spa": false, "framework": "php"},
+    {"domain": "outofwork.life", "type": "webapp", "priority": 2, "auth": "sso", "spa": false, "framework": "php"},
+    {"domain": "disease.zone", "type": "webapp", "priority": 2, "auth": "local", "loginPath": "/login", "spa": true, "framework": "node"},
+    {"domain": "nerdycupid.ai", "type": "webapp", "priority": 3, "auth": "sso", "spa": true},
+    {"domain": "web3dns.io", "type": "webapp", "priority": 2, "auth": "local", "loginPath": "/login", "spa": true, "framework": "node"},
+    {"domain": "status.afterdarksys.com", "type": "internal", "priority": 1, "auth": "none", "spa": false},
+    {"domain": "support.afterdarksys.com", "type": "internal", "priority": 1, "auth": "sso", "spa": true}
   ],
 
   "apis": {
+    "n8n": {
+      "enabled": true,
+      "instances": {
+        "n8nworkflo.ws": {
+          "api_url": "https://n8nworkflo.ws/api/v1",
+          "webhook_url": "https://n8nworkflo.ws/webhook",
+          "api_key_env": "N8N_API_KEY",
+          "health_endpoint": "/healthz"
+        }
+      }
+    },
     "cloudflare": {
       "enabled": true,
       "api_url": "https://api.cloudflare.com/client/v4",
@@ -58,6 +129,7 @@
       "enabled": true,
       "api_url": "https://console.neon.tech/api/v2",
       "api_key_env": "NEON_API_KEY",
+      "org_id": "org-falling-lake-56792490",
       "project_ids": {}
     },
     "aws": {
