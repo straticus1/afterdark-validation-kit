@@ -27,8 +27,10 @@ This document provides Claude with comprehensive instructions for operating, tes
 | **adait** | `../adait` | AI Platform | After Dark AI Tools - ML orchestration platform |
 | **ads_buildservices** | `../ads_buildservices` | Build System | Ansible collections & Terraform providers |
 | **changes.afterdarksys.com** | `../afterdarksys.com/subdomains/changes` | Web UI | Change management frontend |
+| **systemapi.io** | `../systemapi.io` | API Platform | System/infrastructure management APIs |
+| **computeapi.io** | `../computeapi.io` | Compute Platform | On-demand compute orchestration with billing |
 
-### Sites Portfolio (22+ domains)
+### Sites Portfolio (24+ domains)
 
 **Priority 1 (Revenue Critical):**
 - afterdarksys.com, login.afterdarksys.com (SSO)
@@ -36,6 +38,7 @@ This document provides Claude with comprehensive instructions for operating, tes
 - n8nworkflo.ws (SaaS)
 - infrastructure.zone, aiserve.farm (Platform)
 - dnsscience.io, hostscience.io (Services)
+- systemapi.io, computeapi.io (API Platforms)
 
 **Priority 2 (Active):**
 - lonely.fyi, veribits.com, 9lives.xyz, undatable.me

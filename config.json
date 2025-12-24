@@ -211,6 +211,22 @@
         "domain": "sshgw.afterdarksys.com",
         "deployment": "docker",
         "notes": "TCP tunnel proxy - authenticates users via public key or password, forwards to whitelisted backend hosts"
+      },
+      {
+        "name": "systemapi.io",
+        "path": "../systemapi.io",
+        "type": "api-platform",
+        "description": "System API platform - infrastructure management APIs",
+        "runtime": "go"
+      },
+      {
+        "name": "computeapi.io",
+        "path": "../computeapi.io",
+        "type": "compute-platform",
+        "description": "Compute API platform - on-demand compute orchestration with Stripe billing",
+        "runtime": "go",
+        "port": 8080,
+        "healthCheck": "/health"
       }
     ]
   },
@@ -268,7 +284,9 @@
     {"domain": "dnsscience.afterdarksys.com", "type": "dns-platform", "priority": 1, "auth": "local", "spa": false, "framework": "python", "healthCheck": "/health", "port": 5000, "loginPath": "/login"},
     {"domain": "migration.afterdarksys.com", "type": "service", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs"},
     {"domain": "changes.afterdarksys.com", "type": "change-management", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs", "healthCheck": "/api/health", "port": 3012},
-    {"domain": "llmsecurity.dev", "type": "security-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8000, "loginPath": "/login"}
+    {"domain": "llmsecurity.dev", "type": "security-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8000, "loginPath": "/login"},
+    {"domain": "systemapi.io", "type": "api-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health"},
+    {"domain": "computeapi.io", "type": "compute-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8080}
   ],
 
   "apis": {
