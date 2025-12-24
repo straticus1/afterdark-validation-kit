@@ -1,6 +1,6 @@
 {
   "name": "afterdark-validation-kit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Comprehensive infrastructure validation toolkit for AfterDark ecosystem",
   "main": "src/node/index.js",
   "type": "module",
@@ -12,6 +12,9 @@
     "test:database": "node src/node/runner.js --database",
     "test:sites": "node src/node/runner.js --sites",
     "import-keys": "node src/node/import-api.js",
+    "import-keys:projects": "node src/node/import-api.js --projects",
+    "import-keys:dry": "node src/node/import-api.js --projects --dry-run",
+    "list-projects": "node src/node/import-api.js --list-projects",
     "report": "node src/node/reporter.js",
     "validate:all": "npm run test && python3 src/python/run_tests.py --all",
     "setup": "npm install && pip3 install -r requirements.txt"
@@ -24,7 +27,9 @@
     "security",
     "cloudflare",
     "oracle-cloud",
-    "neon"
+    "neon",
+    "n8n",
+    "workflow-automation"
   ],
   "author": "AfterDark Systems",
   "license": "MIT",

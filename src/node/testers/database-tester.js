@@ -50,53 +50,107 @@ export class DatabaseTester {
             return;
         }
 
+        const headers = {
+            'Authorization': `Bearer ${apiKey}`,
+            'Accept': 'application/json'
+        };
+
+        let response;
+        let usedOrgId = false;
+
+        // First, check what orgs this API key has access to
+        let availableOrgs = [];
         try {
-            // Test projects endpoint
-            const response = await axios.get('https://console.neon.tech/api/v2/projects', {
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Accept': 'application/json'
-                },
+            const orgsResponse = await axios.get('https://console.neon.tech/api/v2/users/me/organizations', {
+                headers,
                 timeout: 15000
             });
+            availableOrgs = orgsResponse.data.organizations || [];
+        } catch (e) {
+            // Orgs endpoint may not be available, continue without
+        }
 
-            this.results.tests.push({
-                type: 'Neon',
-                test: 'API Authentication',
-                passed: true,
-                projectCount: response.data.projects?.length || 0
-            });
-            this.results.passed++;
-
-            // Test each project
-            const projects = response.data.projects || [];
-            for (const project of projects) {
-                await this.testNeonProject(apiKey, project);
+        // Try with org_id first if configured
+        if (config.org_id) {
+            try {
+                const orgUrl = `https://console.neon.tech/api/v2/projects?org_id=${config.org_id}`;
+                response = await axios.get(orgUrl, { headers, timeout: 15000 });
+                usedOrgId = true;
+            } catch (orgError) {
+                // If org access fails (not a member), fall back to personal projects
+                const isOrgError = orgError.response?.data?.message?.includes('not an organization member');
+                if (isOrgError) {
+                    this.results.tests.push({
+                        type: 'Neon',
+                        test: `Org Access (${config.org_id})`,
+                        passed: false,
+                        note: 'API key user not in org, falling back to personal projects'
+                    });
+                    this.results.warnings++;
+                }
             }
+        }
 
-        } catch (error) {
-            this.results.tests.push({
-                type: 'Neon',
-                test: 'API Authentication',
-                passed: false,
-                error: error.response?.data?.message || error.message
-            });
-            this.results.failed++;
+        // Fallback to personal projects if org request failed or wasn't attempted
+        if (!response) {
+            try {
+                const personalUrl = 'https://console.neon.tech/api/v2/projects';
+                response = await axios.get(personalUrl, { headers, timeout: 15000 });
+            } catch (error) {
+                const errorMsg = error.response?.data?.message || error.message;
+                const isOrgRequired = errorMsg.includes('org_id is required');
+
+                if (isOrgRequired) {
+                    // API key is org-scoped but we don't have access to the configured org
+                    const orgHint = availableOrgs.length > 0
+                        ? `Available orgs: ${availableOrgs.map(o => o.id || o.name).join(', ')}`
+                        : 'No org access found for this API key';
+                    this.results.tests.push({
+                        type: 'Neon',
+                        test: 'API Authentication',
+                        passed: false,
+                        error: `Org-scoped API key requires valid org_id. Configured: "${config.org_id}". ${orgHint}`
+                    });
+                } else {
+                    this.results.tests.push({
+                        type: 'Neon',
+                        test: 'API Authentication',
+                        passed: false,
+                        error: errorMsg
+                    });
+                }
+                this.results.failed++;
+                return;
+            }
+        }
+
+        this.results.tests.push({
+            type: 'Neon',
+            test: 'API Authentication',
+            passed: true,
+            projectCount: response.data.projects?.length || 0,
+            scope: usedOrgId ? `org:${config.org_id}` : 'personal'
+        });
+        this.results.passed++;
+
+        // Test each project
+        const projects = response.data.projects || [];
+        for (const project of projects) {
+            await this.testNeonProject(apiKey, project);
         }
     }
 
     async testNeonProject(apiKey, project) {
+        const headers = {
+            'Authorization': `Bearer ${apiKey}`,
+            'Accept': 'application/json'
+        };
+
         try {
             // Get project details
             const response = await axios.get(
                 `https://console.neon.tech/api/v2/projects/${project.id}`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Accept': 'application/json'
-                    },
-                    timeout: 15000
-                }
+                { headers, timeout: 15000 }
             );
 
             const projectData = response.data.project;
@@ -114,13 +168,7 @@ export class DatabaseTester {
             // Get branches
             const branchesResponse = await axios.get(
                 `https://console.neon.tech/api/v2/projects/${project.id}/branches`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Accept': 'application/json'
-                    },
-                    timeout: 15000
-                }
+                { headers, timeout: 15000 }
             );
 
             const branches = branchesResponse.data.branches || [];
@@ -141,13 +189,7 @@ export class DatabaseTester {
             // Get endpoints
             const endpointsResponse = await axios.get(
                 `https://console.neon.tech/api/v2/projects/${project.id}/endpoints`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Accept': 'application/json'
-                    },
-                    timeout: 15000
-                }
+                { headers, timeout: 15000 }
             );
 
             const endpoints = endpointsResponse.data.endpoints || [];

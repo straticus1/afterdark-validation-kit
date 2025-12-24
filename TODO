@@ -1,0 +1,21 @@
+please update: "afterdark-validation-toolkit"
+Please update: /Users/ryan/development/afterdark-validation-kit
+Please review and overhual:
+all modules are in: /Users/ryan/development/$repo_name where $repo_name = directory name under /Users/ryan/development/ where directory is the repo/module
+
+llmsecurity.dev
+afterdarksys.com/subdomains/*
+adsops-utils
+adit
+ads_buildservices
+
+- increase functionality by 50-80%
+- fix all bugs and ensure they work
+- ensure they can be installed and run
+- ensure they work correctly with all of the API's needed
+- ensure llmsecurity.dev support afterdarksys central login
+- ensure llmsecurity.dev support GitHub,Google,Discord oauth2
+   - leave me oauth2 setup instructions for this repo
+   - remind me what you need
+   - *I dont do this part enough so i always forget, maybe once or twice every year or two
+

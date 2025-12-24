@@ -48,6 +48,169 @@
         "path": "../afterdarksys.com",
         "type": "main-site",
         "description": "Main After Dark Systems website and SSO provider"
+      },
+      {
+        "name": "claude-cloudflare-skill",
+        "path": "../claude-cloudflare-skill",
+        "type": "claude-skill",
+        "description": "Cloudflare management skill for Claude Code"
+      },
+      {
+        "name": "coredns",
+        "path": "../coredns",
+        "type": "dns-toolkit",
+        "description": "DNS Science CoreDNS Toolkit - enterprise DNS management"
+      },
+      {
+        "name": "dnsscience-tools",
+        "path": "../dnsscience-tools",
+        "type": "dns-toolkit",
+        "description": "Complete network engineering and DNS analysis toolkit"
+      },
+      {
+        "name": "dnsscience.io",
+        "path": "../afterdarksys.com/subdomains/dnsscience",
+        "type": "dns-service",
+        "description": "DNS Science web application and API"
+      },
+      {
+        "name": "web3dns.io",
+        "path": "../web3dns.io",
+        "type": "webapp",
+        "description": "Web3 DNS management platform"
+      },
+      {
+        "name": "hostscience.io",
+        "path": "../hostscience.io",
+        "type": "landing",
+        "description": "Host Science hosting services"
+      },
+      {
+        "name": "flipdomain.io",
+        "path": "../flipdomain.io",
+        "type": "webapp",
+        "description": "Domain flipping marketplace"
+      },
+      {
+        "name": "flipid.io",
+        "path": "../flipid.io",
+        "type": "webapp",
+        "description": "Identity management platform"
+      },
+      {
+        "name": "login.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/login",
+        "type": "sso-service",
+        "description": "Central SSO service with JWT and 2FA",
+        "runtime": "nodejs",
+        "port": 3001,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "billing.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/billing",
+        "type": "billing-service",
+        "description": "Stripe payment platform with subscription management",
+        "runtime": "nodejs",
+        "port": 3004,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "admin.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/admin",
+        "type": "admin-portal",
+        "description": "Control panel with WebSocket support",
+        "runtime": "nodejs",
+        "port": 3003,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "api.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/api",
+        "type": "api-gateway",
+        "description": "Express API gateway with Swagger and rate limiting",
+        "runtime": "nodejs",
+        "port": 3002,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "support.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/support",
+        "type": "support-portal",
+        "description": "PHP ticketing system with JWT auth",
+        "runtime": "php",
+        "port": 80,
+        "healthCheck": "/api/health"
+      },
+      {
+        "name": "dnsscience.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/dnsscience",
+        "type": "dns-platform",
+        "description": "DNS analytics platform with Celery, GraphQL, and AI",
+        "runtime": "python",
+        "port": 5000,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "dnsscience-coredns",
+        "path": "../coredns",
+        "type": "dns-toolkit",
+        "description": "CoreDNS/Unbound migration toolkit - enterprise K8s DNS",
+        "runtime": "go",
+        "notes": "Built from real-world migration experience. CoreDNS is 20-40% more performant than Unbound in K8s environments."
+      },
+      {
+        "name": "adsops-utils",
+        "path": "../adsops-utils",
+        "type": "change-management",
+        "description": "Enterprise change management CLI and API with multi-industry compliance",
+        "runtime": "go",
+        "port": 8080,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "adait",
+        "path": "../adait",
+        "type": "ai-platform",
+        "description": "After Dark AI Tools - AI/ML orchestration platform",
+        "runtime": "python"
+      },
+      {
+        "name": "ads_buildservices",
+        "path": "../ads_buildservices",
+        "type": "build-system",
+        "description": "Build services with Ansible collections and Terraform providers",
+        "runtime": "go"
+      },
+      {
+        "name": "changes.afterdarksys.com",
+        "path": "../afterdarksys.com/subdomains/changes",
+        "type": "change-management-ui",
+        "description": "Change management web frontend connecting to adsops-utils",
+        "runtime": "nodejs",
+        "port": 3012,
+        "healthCheck": "/api/health"
+      },
+      {
+        "name": "llmsecurity.dev",
+        "path": "../llmsecurity.dev",
+        "type": "security-platform",
+        "description": "AI Model Security Platform - malware & vulnerability scanning",
+        "runtime": "go",
+        "port": 8000,
+        "healthCheck": "/health"
+      },
+      {
+        "name": "hostscience-sshproxy",
+        "path": "../hostscience-sshproxy",
+        "type": "ssh-proxy",
+        "description": "SSH proxy/bastion server with per-user ACL controls",
+        "runtime": "go",
+        "port": 2222,
+        "protocol": "ssh",
+        "domain": "sshgw.afterdarksys.com",
+        "deployment": "docker",
+        "notes": "TCP tunnel proxy - authenticates users via public key or password, forwards to whitelisted backend hosts"
       }
     ]
   },
@@ -75,7 +238,7 @@
 
   "sites": [
     {"domain": "afterdarksys.com", "type": "platform", "priority": 1, "auth": "sso", "spa": true, "expectFeatures": ["admin", "operators"]},
-    {"domain": "login.afterdarksys.com", "type": "auth", "priority": 1, "auth": "local", "loginPath": "/", "spa": true},
+    {"domain": "login.afterdarksys.com", "type": "auth", "priority": 1, "auth": "local", "loginPath": "/", "spa": true, "framework": "nodejs", "healthCheck": "/health", "port": 3001},
     {"domain": "n8nworkflo.ws", "type": "n8n", "priority": 1, "project": "n8nworkflo.ws", "auth": "local", "loginPath": "/signin", "spa": true, "thirdParty": true},
     {"domain": "ecosystem.zone", "type": "static", "priority": 1, "project": "ecosystem.zone", "auth": "none", "spa": false},
     {"domain": "infrastructure.zone", "type": "platform", "priority": 1, "auth": "sso", "spa": true, "framework": "astro"},
@@ -95,7 +258,17 @@
     {"domain": "nerdycupid.ai", "type": "webapp", "priority": 3, "auth": "sso", "spa": true},
     {"domain": "web3dns.io", "type": "webapp", "priority": 2, "auth": "local", "loginPath": "/login", "spa": true, "framework": "node"},
     {"domain": "status.afterdarksys.com", "type": "internal", "priority": 1, "auth": "none", "spa": false},
-    {"domain": "support.afterdarksys.com", "type": "internal", "priority": 1, "auth": "sso", "spa": true}
+    {"domain": "support.afterdarksys.com", "type": "support", "priority": 1, "auth": "sso", "spa": false, "framework": "php", "healthCheck": "/api/health"},
+    {"domain": "admin.afterdarksys.com", "type": "admin", "priority": 1, "auth": "sso", "spa": true, "requireAdmin": true, "framework": "nodejs", "healthCheck": "/health", "port": 3003},
+    {"domain": "api.afterdarksys.com", "type": "api", "priority": 1, "auth": "token", "spa": false, "framework": "nodejs", "healthCheck": "/health", "port": 3002, "swagger": "/docs"},
+    {"domain": "billing.afterdarksys.com", "type": "billing", "priority": 1, "auth": "sso", "spa": true, "framework": "nodejs", "healthCheck": "/health", "port": 3004},
+    {"domain": "catalog.afterdarksys.com", "type": "internal", "priority": 1, "auth": "sso", "spa": true},
+    {"domain": "analytics.afterdarksys.com", "type": "internal", "priority": 1, "auth": "sso", "spa": true},
+    {"domain": "cdn.afterdarksys.com", "type": "cdn", "priority": 1, "auth": "none", "spa": false},
+    {"domain": "dnsscience.afterdarksys.com", "type": "dns-platform", "priority": 1, "auth": "local", "spa": false, "framework": "python", "healthCheck": "/health", "port": 5000, "loginPath": "/login"},
+    {"domain": "migration.afterdarksys.com", "type": "service", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs"},
+    {"domain": "changes.afterdarksys.com", "type": "change-management", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs", "healthCheck": "/api/health", "port": 3012},
+    {"domain": "llmsecurity.dev", "type": "security-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8000, "loginPath": "/login"}
   ],
 
   "apis": {
@@ -133,7 +306,7 @@
       "project_ids": {}
     },
     "aws": {
-      "enabled": true,
+      "enabled": false,
       "access_key_env": "AWS_ACCESS_KEY_ID",
       "secret_key_env": "AWS_SECRET_ACCESS_KEY",
       "region": "us-east-1"

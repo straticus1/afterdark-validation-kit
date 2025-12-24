@@ -45,16 +45,22 @@ export class SiteTester {
     }
 
     async testSite(site, testConfig) {
+        // Handle API type sites differently - they run on different ports
+        if (site.type === 'api') {
+            await this.testApiEndpoint(site);
+            return;
+        }
+
         const baseUrl = `https://${site.domain}`;
 
         // Basic connectivity
         await this.testConnectivity(site.domain, baseUrl);
 
-        // Test critical pages
-        await this.testCriticalPages(site.domain, baseUrl);
+        // Test critical pages (pass site config for auth-aware testing)
+        await this.testCriticalPages(site.domain, baseUrl, site);
 
-        // Test forms
-        await this.testForms(site.domain, baseUrl);
+        // Test forms (pass site config for auth-aware testing)
+        await this.testForms(site.domain, baseUrl, site);
 
         // Test JavaScript errors (if browser available)
         if (this.browser) {
@@ -70,6 +76,70 @@ export class SiteTester {
         // Site-specific tests based on type
         if (site.type === 'platform') {
             await this.testPlatformFeatures(site.domain, baseUrl);
+        }
+    }
+
+    async testApiEndpoint(site) {
+        // API endpoints run on custom ports (default 8080) and use HTTP
+        const port = site.port || 8080;
+        const protocol = site.protocol || 'http';
+        const baseUrl = `${protocol}://${site.domain}:${port}`;
+        const healthPath = site.healthPath || '/health';
+
+        try {
+            const start = Date.now();
+            const response = await axios.get(`${baseUrl}${healthPath}`, {
+                timeout: 15000,
+                validateStatus: () => true
+            });
+            const latency = Date.now() - start;
+
+            const isHealthy = response.status === 200 &&
+                (typeof response.data === 'object' || typeof response.data === 'string');
+
+            this.results.tests.push({
+                domain: site.domain,
+                type: 'API',
+                test: 'Health Endpoint',
+                passed: isHealthy,
+                status: response.status,
+                latency,
+                response: typeof response.data === 'object' ? response.data : undefined
+            });
+
+            if (isHealthy) {
+                this.results.passed++;
+            } else {
+                this.results.failed++;
+            }
+
+            // Check API returns JSON
+            const contentType = response.headers['content-type'] || '';
+            const isJson = contentType.includes('application/json');
+
+            this.results.tests.push({
+                domain: site.domain,
+                type: 'API',
+                test: 'Returns JSON',
+                passed: isJson,
+                contentType
+            });
+
+            if (isJson) {
+                this.results.passed++;
+            } else {
+                this.results.warnings++;
+            }
+
+        } catch (error) {
+            this.results.tests.push({
+                domain: site.domain,
+                type: 'API',
+                test: 'Health Endpoint',
+                passed: false,
+                error: error.code || error.message
+            });
+            this.results.failed++;
         }
     }
 
@@ -127,11 +197,30 @@ export class SiteTester {
         }
     }
 
-    async testCriticalPages(domain, baseUrl) {
+    async testCriticalPages(domain, baseUrl, site = {}) {
         const criticalPages = [
             { path: '/', name: 'Homepage' },
-            { path: '/login.php', name: 'Login Page' },
         ];
+
+        // Add login page test based on auth type
+        // auth: "local" - has own login page at loginPath
+        // auth: "sso" - uses central SSO (login.afterdarksys.com), skip local login test
+        // auth: "none" - no login needed, skip login test
+        if (site.auth === 'local' && site.loginPath) {
+            criticalPages.push({ path: site.loginPath, name: 'Login Page' });
+        } else if (site.auth === 'sso') {
+            // Skip - uses SSO, record as info
+            this.results.tests.push({
+                domain,
+                type: 'Critical Pages',
+                test: 'Login Page',
+                passed: true,
+                skipped: true,
+                note: 'Uses SSO (login.afterdarksys.com)'
+            });
+            this.results.passed++;
+        }
+        // auth: "none" - no login test needed
 
         for (const page of criticalPages) {
             try {
@@ -199,9 +288,18 @@ export class SiteTester {
         }
     }
 
-    async testForms(domain, baseUrl) {
+    async testForms(domain, baseUrl, site = {}) {
+        // Skip form tests for SSO or no-auth sites
+        if (site.auth === 'sso' || site.auth === 'none') {
+            this.results.skipped += 2; // Skip form structure and CSRF tests
+            return;
+        }
+
+        // Use configured login path or default
+        const loginPath = site.loginPath || '/login';
+
         try {
-            const response = await axios.get(`${baseUrl}/login.php`, {
+            const response = await axios.get(`${baseUrl}${loginPath}`, {
                 timeout: 15000,
                 validateStatus: () => true
             });

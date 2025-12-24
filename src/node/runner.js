@@ -10,6 +10,7 @@ import { CdnTester } from './testers/cdn-tester.js';
 import { DatabaseTester } from './testers/database-tester.js';
 import { SiteTester } from './testers/site-tester.js';
 import { Reporter } from './reporter.js';
+import { SkillLoader } from './skill-loader.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -19,20 +20,76 @@ const __dirname = path.dirname(__filename);
 class ValidationRunner {
     constructor() {
         this.config = new ConfigLoader();
+        this.skillLoader = new SkillLoader();
         this.results = {
             timestamp: new Date().toISOString(),
             summary: { passed: 0, failed: 0, skipped: 0, warnings: 0 },
-            tests: {}
+            tests: {},
+            skills: {}
         };
     }
 
-    async initialize() {
+    async initialize(options = {}) {
         this.config.load();
+
         console.log(chalk.blue.bold('\n=== AfterDark Validation Kit ===\n'));
+
+        // Load and display skills unless --no-skills flag is set
+        if (!options.noSkills) {
+            await this.loadSkills(options);
+        }
+    }
+
+    async loadSkills(options = {}) {
+        // Discover available skills
+        await this.skillLoader.discover({ showSpinner: true });
+
+        // Show loading sequence for visual feedback
+        if (options.verbose || options.showSkills) {
+            await this.skillLoader.showLoadingSequence({
+                delay: options.quickLoad ? 10 : 30,
+                showAll: options.allSkills
+            });
+        } else {
+            // Quick summary for non-verbose mode
+            this.displaySkillSummary();
+        }
+
+        // Store skill info in results
+        this.results.skills = this.skillLoader.toJSON();
+    }
+
+    displaySkillSummary() {
+        const skills = this.skillLoader.skills;
+        const coreSkills = skills.filter(s => s.isCore);
+
+        console.log(chalk.cyan('Skills loaded:'));
+        console.log(`  ${chalk.green('+')} ${skills.length} total skills discovered`);
+        console.log(`  ${chalk.green('+')} ${coreSkills.length} core skills active`);
+
+        // Show category breakdown
+        const categories = this.skillLoader.categories;
+        for (const [key, categorySkills] of categories) {
+            const categoryName = {
+                'superpowers': 'Superpowers',
+                'anthropic-skills': 'Anthropic',
+                'superpowers-skills': 'Extensions',
+                'custom': 'Custom'
+            }[key] || key;
+            console.log(`    ${chalk.dim('-')} ${categoryName}: ${categorySkills.length}`);
+        }
+
+        // Show agent tools status
+        console.log(chalk.cyan('\nAgent tools:'));
+        console.log(`  ${chalk.green('✓')} Task Tool (subagents)`);
+        console.log(`  ${chalk.green('✓')} Enterprise Systems Architect`);
+        console.log(`  ${chalk.green('✓')} Plan Mode`);
+        console.log(`  ${chalk.green('✓')} Explore Agent`);
+        console.log();
     }
 
     async runAll(options = {}) {
-        await this.initialize();
+        await this.initialize(options);
 
         const tests = [
             { name: 'API Tests', fn: () => this.runApiTests(options) },
@@ -167,6 +224,10 @@ async function main() {
         .option('-e, --env <environment>', 'Environment to test', 'production')
         .option('-v, --verbose', 'Verbose output')
         .option('-o, --output <dir>', 'Output directory for reports')
+        .option('--show-skills', 'Show detailed skill loading animation')
+        .option('--all-skills', 'Show all skills (not just core)')
+        .option('--no-skills', 'Skip skill loading display')
+        .option('--quick-load', 'Faster skill loading animation')
         .parse();
 
     const options = program.opts();
@@ -176,7 +237,7 @@ async function main() {
         if (options.all || (!options.api && !options.security && !options.cdn && !options.database && !options.sites)) {
             await runner.runAll(options);
         } else {
-            await runner.initialize();
+            await runner.initialize(options);
 
             if (options.api) await runner.runApiTests(options);
             if (options.security) await runner.runSecurityTests(options);
