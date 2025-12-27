@@ -42,6 +42,7 @@ This document provides Claude with comprehensive instructions for operating, tes
 | **blasebase.com** | `../blasebase.com` | DBaaS Platform | Database-as-a-Service with BlazeDB (SQLite), BlazeCache (Redis), BlazeTSDB (InfluxDB) |
 | **adsaichat-cli** | `../adsaichat-cli` | CLI Tool | Swiss army knife CLI for testing AI models via OpenRouter |
 | **ads-toolkit-all** | `../ads-toolkit-all` | Monorepo | Aggregated ADS tools monorepo with git submodules |
+| **afterdark-entitlements-policy** | `../afterdark-entitlements-policy` | Entitlements | PAM module for OS-level entitlement enforcement with HIPAA/FedRAMP compliance |
 
 ### Sites Portfolio (24+ domains)
 
@@ -148,6 +149,46 @@ make run               # Run API server
 # - Threat Intel Feed: Global AI attack intelligence
 # - Compliance: OWASP LLM Top 10, EU AI Act mapping
 ```
+
+### AfterDark Entitlements Policy (PAM Module)
+
+```bash
+cd ../afterdark-entitlements-policy
+
+# Build PAM module (requires libpam-dev, libcurl-dev, libjson-c-dev)
+cd pam_module
+make                   # Build pam_afterdark.so
+make debug             # Debug build with symbols
+
+# Install (Linux only)
+sudo make install      # Copies to /lib/security/
+
+# Configure environment
+export AFTERDARK_API_URL=https://entitlements.afterdarksys.com/api/v1
+export AFTERDARK_API_KEY=your-api-key
+
+# Test with pamtester
+pamtester -v sshd yourusername authenticate
+
+# API Contract (expected response from entitlements API)
+# GET /api/v1/entitlements/check?user=<user>&service=<service>&rhost=<host>
+# {
+#   "permitted": true,
+#   "require_elevate": false,      # 2FA required if true
+#   "denied_reason": null,
+#   "allowed_hosts": "server1,server2",
+#   "valid_from": 1703462400,      # Unix timestamp
+#   "valid_until": 1735084800
+# }
+```
+
+**Features:**
+- OS-level access control for SSH, sudo, console login
+- Time-based access constraints
+- Host allowlists for SSH destinations
+- Elevated access groups requiring 2FA
+- HIPAA § 164.312 compliant audit logging
+- FedRAMP/FIPS 140-2 compatible
 
 ### adsaichat-cli (AI Model Testing)
 
