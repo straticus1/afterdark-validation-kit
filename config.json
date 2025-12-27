@@ -227,6 +227,78 @@
         "runtime": "go",
         "port": 8080,
         "healthCheck": "/health"
+      },
+      {
+        "name": "vault-oci",
+        "path": "../vault-oci",
+        "type": "secrets-management",
+        "description": "HashiCorp Vault on OCI Kubernetes with cert-manager PKI integration",
+        "runtime": "kubernetes",
+        "port": 8200,
+        "healthCheck": "/v1/sys/health",
+        "notes": "Vault in standalone mode with file storage. Used for PKI certificate issuance via cert-manager ClusterIssuer."
+      },
+      {
+        "name": "secretserver.io",
+        "path": "../secretserver.io",
+        "type": "secrets-platform",
+        "description": "Managed secrets & certificate management platform with Stripe billing",
+        "runtime": "go",
+        "port": 8443,
+        "healthCheck": "/health",
+        "notes": "HCP Vault alternative. Integrates with cert-manager, includes CLI (adkm), automated certificate renewals."
+      },
+      {
+        "name": "ads-ai-staff",
+        "path": "../ads-ai-staff",
+        "type": "ai-platform",
+        "description": "AI Staff platform - agents, chatbots, and n8n automation",
+        "runtime": "nodejs",
+        "notes": "Executive team integrated: Marcus Chen (CEO), Diana Reyes (CSO). See CLAUDE.md for delegation chain."
+      },
+      {
+        "name": "telcocloud-deploy.sh",
+        "path": "../telcocloud-deploy.sh",
+        "type": "deploy-script",
+        "description": "TelcoCloud deployment script",
+        "runtime": "bash"
+      },
+      {
+        "name": "telcocloud-workers",
+        "path": "../telcocloud-workers",
+        "type": "cloudflare-workers",
+        "description": "TelcoCloud Cloudflare Workers",
+        "runtime": "typescript"
+      },
+      {
+        "name": "telcocloud-shared",
+        "path": "../telcocloud-shared",
+        "type": "shared-library",
+        "description": "TelcoCloud shared TypeScript library",
+        "runtime": "typescript"
+      },
+      {
+        "name": "telcocloud-cli",
+        "path": "../telcocloud-cli",
+        "type": "cli-tool",
+        "description": "TelcoCloud CLI tool",
+        "runtime": "typescript"
+      },
+      {
+        "name": "telcocloud.io",
+        "path": "../telcocloud.io",
+        "type": "webapp",
+        "description": "TelcoCloud platform - telecom cloud services",
+        "runtime": "nextjs",
+        "healthCheck": "/api/health"
+      },
+      {
+        "name": "adstelco.io",
+        "path": "../adstelco.io",
+        "type": "webapp",
+        "description": "After Dark Systems Telco platform",
+        "runtime": "nextjs",
+        "healthCheck": "/api/health"
       }
     ]
   },
@@ -286,7 +358,10 @@
     {"domain": "changes.afterdarksys.com", "type": "change-management", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs", "healthCheck": "/api/health", "port": 3012},
     {"domain": "llmsecurity.dev", "type": "security-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8000, "loginPath": "/login"},
     {"domain": "systemapi.io", "type": "api-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health"},
-    {"domain": "computeapi.io", "type": "compute-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8080}
+    {"domain": "computeapi.io", "type": "compute-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8080},
+    {"domain": "secretserver.io", "type": "secrets-platform", "priority": 1, "auth": "sso", "spa": false, "framework": "go", "healthCheck": "/health", "port": 8443},
+    {"domain": "telcocloud.io", "type": "webapp", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs", "healthCheck": "/api/health"},
+    {"domain": "adstelco.io", "type": "webapp", "priority": 1, "auth": "sso", "spa": true, "framework": "nextjs", "healthCheck": "/api/health"}
   ],
 
   "apis": {
