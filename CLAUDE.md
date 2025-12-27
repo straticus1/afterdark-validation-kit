@@ -41,6 +41,7 @@ This document provides Claude with comprehensive instructions for operating, tes
 | **telcocloud-cli** | `../telcocloud-cli` | CLI Tool | TelcoCloud command-line interface |
 | **blasebase.com** | `../blasebase.com` | DBaaS Platform | Database-as-a-Service with BlazeDB (SQLite), BlazeCache (Redis), BlazeTSDB (InfluxDB) |
 | **adsaichat-cli** | `../adsaichat-cli` | CLI Tool | Swiss army knife CLI for testing AI models via OpenRouter |
+| **ads-toolkit-all** | `../ads-toolkit-all` | Monorepo | Aggregated ADS tools monorepo with git submodules |
 
 ### Sites Portfolio (24+ domains)
 
@@ -191,6 +192,33 @@ node index.js -p computeapi    # Route through computeapi.io
 ```
 
 **Environment variables:** `OPENROUTER_API_KEY` or `ADS_API_KEY`
+
+### ADS Toolkit All (Monorepo)
+
+```bash
+cd ../ads-toolkit-all
+
+# Initialize all submodules
+git submodule update --init --recursive
+
+# Update all submodules to latest
+git submodule update --remote --merge
+```
+
+**Included Submodules:**
+- `adsops-utils` - Enterprise change management CLI/API
+- `ads_buildservices` - Ansible collections & Terraform providers
+- `warp-oci` - On-demand Warp AI agent hosting
+- `opencode-oci` - OpenCode OCI deployment
+- `sslmgr` - SSL certificate manager
+- `gpg-key-tracker` - GPG key lifecycle tracking
+- `dnsscience-globaldetect` - Global DNS detection
+- `dnsscience-rancid-ng` - Network device config management
+- `dnsscience-tools` - DNS analysis suite
+- `adait` - After Dark AI Tools
+- `aws-savings-check` - AWS cost optimization
+- `oci-savings-check` - OCI cost optimization
+- `openssl-sox-jira` - OpenSSL SOX compliance with Jira integration
 
 ### Warp-OCI Infrastructure
 
@@ -1457,6 +1485,7 @@ If encountering issues that cannot be resolved autonomously:
 
 ### New Projects Added (v2.5.0)
 - `adsaichat-cli` - Swiss army knife CLI for testing 200+ AI models via OpenRouter with streaming responses, model aliases, conversation history, and proxy support (systemapi.io, computeapi.io)
+- `ads-toolkit-all` - Aggregated ADS tools monorepo with 13 git submodules (adsops-utils, warp-oci, adait, dnsscience-tools, sslmgr, gpg-key-tracker, and more)
 
 ### Features
 - **Multi-Model Testing** - Access GPT-4, Claude, Llama, Mistral, Gemini, DeepSeek, Qwen and more
